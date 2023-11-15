@@ -4,33 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEBGL</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body onload="start()">
   <canvas id="glcanvas" width="800" height="600">
     Your browser doesn't appear to support the HTML5
     <code>&lt;canvas&gt;</code> element.
   </canvas>
-  <script  id="vertex-shader-2d" type="notjs">
-
-  attribute vec2 a_position;
-
-  uniform vec2 u_resolution;
-  uniform vec2 u_translation;
-
-  void main() {
-    // Add in the translation.
-    vec2 position = a_position + u_translation;
-    // convert the position from pixels to 0.0 to 1.0
-    vec2 zeroToOne = position / u_resolution;
-    // convert from 0->1 to 0->2
-    vec2 zeroToTwo = zeroToOne * 2.0;
-    // convert from 0->2 to -1->+1 (clipspace)
-    vec2 clipSpace = zeroToTwo - 1.0;
-    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-}
-  
+  <table>
+    <tr>
+      <td>Move X</td>
+      <td>
+          <input type="range" class="slider" id="moveX">
+      </td>
+      <td>
+          <input type="number" step="1" id="moveXOut">
+      </td>
+  </tr>
+  <tr>
+      <td>Move Y</td>
+      <td>
+          <input type="range" class="slider" id="moveY">
+      </td>
+      <td>
+          <input type="number" step="1" id="moveYOut">
+      </td>
+  </tr>
+  <tr>
+    <td>Move Z</td>
+    <td>
+        <input type="range" class="slider" id="moveZ">
+    </td>
+    <td>
+        <input type="number" step="1" id="moveZOut">
+    </td>
+</tr>
+  <tr>
+      <td>Rotation X</td>
+      <td>
+          <input type="range" class="slider" id="angleX">
+      </td>
+  </tr>
+  <tr>
+    <td>Rotation Y</td>
+    <td>
+        <input type="range" class="slider" id="angleY">
+    </td>
+</tr>
+<tr>
+  <td>Rotation Z</td>
+  <td>
+      <input type="range" class="slider" id="angleZ">
+  </td>
+</tr>
+  </table>
+  <script  id="vertex-shader-3d" type="notjs">
+    attribute vec4 a_position;
+ 
+    uniform mat4 u_matrix;
+ 
+    void main() {
+      // Умножаем координату на матрицу
+      gl_Position = u_matrix * a_position;
+  }
   </script>
-  <script  id="fragment-shader-2d" type="notjs">
+  <script  id="fragment-shader-3d" type="notjs">
     precision mediump float;
 
     uniform vec4 u_color;
@@ -40,7 +78,9 @@
     }
   
   </script>
+  <script src="matrix.js"></script>
   <script src="script.js"></script>
+
 </body>
 </body>
 </html>
