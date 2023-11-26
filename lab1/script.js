@@ -60,12 +60,16 @@ function start() {
   let colorLocation = gl.getAttribLocation(program, "a_color");
   //Uniform
   let matrixLocation = gl.getUniformLocation(program, "u_matrix");
+  //let fudgeLocation = gl.getUniformLocation(program, "u_fudgeFactor");
+
+  //let fudgeFactor = 1
   
   // Position Buffer
   let positionBuffer = gl.createBuffer();
   // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(choords), gl.STATIC_DRAW)
+  
 
   // Create a buffer to put colors in
   let colorBuffer = gl.createBuffer();
@@ -83,8 +87,9 @@ function start() {
   }
 
 
-  let translation = [45, 150, -100];
+  let translation = [-150, 0, -360];
   let rotation = [degToRad(40), degToRad(25), degToRad(325)];
+  let fieldOfViewRadians = degToRad(60);
 
 
   let angleX = document.getElementById("angleX");
@@ -93,6 +98,10 @@ function start() {
   let positionX = document.getElementById("moveX");
   let positionY = document.getElementById("moveY");
   let positionZ = document.getElementById("moveZ");
+  let fieldOfView = document.getElementById("fieldOfView");
+  fieldOfView.value = radToDeg(fieldOfViewRadians);
+  fieldOfView.min = 1;
+  fieldOfView.max = 179;
   angleX.value = rotation[0];
   angleX.min = 0;
   angleX.max = 360;
@@ -117,12 +126,12 @@ function start() {
   positionX.value = translation[0];
   positionY.value = translation[1];
   positionZ.value = translation[2];
-  positionX.min = 0;
-  positionY.min = 0;
-  positionZ.min = 0;
+  positionX.min = -200;
+  positionY.min = -200;
+  positionZ.min = -1000;
   positionX.max = canvas.width;
   positionY.max = canvas.height;
-  positionZ.max = 500;
+  positionZ.max = 0;
 
   positionX.oninput = function() {
     updatePosition(0, positionX)  
@@ -136,6 +145,10 @@ function start() {
     updatePosition(2, positionZ)  
   }
    
+  fieldOfView.oninput = function() {
+    fieldOfViewRadians = degToRad(fieldOfView.value);
+    drawScene();
+  }
 
   function updatePosition(index, ui) {
     translation[index] = ui.value;
@@ -169,6 +182,8 @@ function start() {
 
     // Bind the position buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    // Задаём fudgeFactor
+   //gl.uniform1f(fudgeLocation, fudgeFactor);
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
     let size = 3;          // 2 components per iteration
@@ -194,7 +209,14 @@ function start() {
     gl.vertexAttribPointer(colorLocation, size, type, normalize, stride, offset);
 
 
-    let matrix = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    
+    //let matrix = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    //let matrix = makeZToWMatrix(fudgeFactor);
+    let aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    let zNear = 1;
+    let zFar = 2000;
+    let matrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+    //matrix = m4.multiply(matrix, m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400));
     matrix = m4.translate(matrix, translation[0], translation[1], translation[2]);
     matrix = m4.xRotate(matrix, rotation[0]);
     matrix = m4.yRotate(matrix, rotation[1]);
@@ -228,6 +250,15 @@ function initWebGL(canvas) {
     return gl;
   }
 
+
+  function makeZToWMatrix(fudgeFactor) {
+    return [
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, fudgeFactor,
+      0, 0, 0, 1,
+    ];
+  }
 
 
   // Fill the buffer with colors for the 'F'.
