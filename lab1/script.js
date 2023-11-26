@@ -27,6 +27,18 @@ function createProgram(gl, vertexShader, fragmentShader) {
   gl.deleteProgram(program);
 }
 
+function initWebGL(canvas) {
+  gl = null;
+  try {
+    gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  } catch (e) {}
+  if (!gl) {
+    alert("Unable to initialize WebGL. Your browser may not support it.");
+    gl = null;
+  }
+  return gl;
+}
+
 
 
 function start() {
@@ -53,22 +65,16 @@ function start() {
   let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
   let program = createProgram(gl, vertexShader, fragmentShader);
   
-  // //Attribute
-  // let positionLocation = gl.getAttribLocation(program, "a_position");
-  // let colorLocation = gl.getAttribLocation(program, "a_color");
-  // //Uniform
-  // let matrixLocation = gl.getUniformLocation(program, "u_matrix");
-    // look up where the vertex data needs to go.
-    let positionLocation = gl.getAttribLocation(program, "a_position");
-    let normalLocation = gl.getAttribLocation(program, "a_normal");
+  let positionLocation = gl.getAttribLocation(program, "a_position");
+  let normalLocation = gl.getAttribLocation(program, "a_normal");
   
-    // lookup uniforms
-    let worldViewProjectionLocation = gl.getUniformLocation(program, "u_worldViewProjection");
-    let worldInverseTransposeLocation = gl.getUniformLocation(program, "u_worldInverseTranspose");
-    let colorLocation = gl.getUniformLocation(program, "u_color");
+  // lookup uniforms
+  let worldViewProjectionLocation = gl.getUniformLocation(program, "u_worldViewProjection");
+  let worldInverseTransposeLocation = gl.getUniformLocation(program, "u_worldInverseTranspose");
+  let colorLocation = gl.getUniformLocation(program, "u_color");
 
-    let lightWorldPositionLocation = gl.getUniformLocation(program, "u_lightWorldPosition");
-    let worldLocation = gl.getUniformLocation(program, "u_world");
+  let lightWorldPositionLocation = gl.getUniformLocation(program, "u_lightWorldPosition");
+  let worldLocation = gl.getUniformLocation(program, "u_world");
   
   // Position Buffer
   let positionBuffer = gl.createBuffer();
@@ -80,17 +86,17 @@ function start() {
   // let colorBuffer = gl.createBuffer();
   // gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer); 
   // setColors(gl);
-    // Create a buffer to put normals in
-    var normalBuffer = gl.createBuffer();
-    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = normalBuffer)
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    // Put normals data into buffer
-    setNormals(gl);
+  // Create a buffer to put normals in
+  let normalBuffer = gl.createBuffer();
+  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = normalBuffer)
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  // Put normals data into buffer
+  setNormals(gl);
 
   //let translation = [-150, 0, -360];
   //let rotation = [degToRad(40), degToRad(25), degToRad(325)];
   let fieldOfViewRadians = degToRad(60);
-  var fRotationRadians = 0;
+  let fRotationRadians = 0;
 
 
   // let angleX = document.getElementById("angleX");
@@ -263,20 +269,7 @@ function start() {
   console.log("print")
 }
 
-function initWebGL(canvas) {
-    gl = null;
-  
-    try {
-      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    } catch (e) {}
-  
-    if (!gl) {
-      alert("Unable to initialize WebGL. Your browser may not support it.");
-      gl = null;
-    }
-  
-    return gl;
-  }
+
 
 
 
@@ -288,235 +281,7 @@ function initWebGL(canvas) {
     return d * Math.PI / 180;
   }
 
-
-
-
-  // Fill the buffer with colors for the 'F'.
-function setColors(gl) {
-  console.log(2)
-  gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Uint8Array([
-          // left column front
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-
-          // top rung front
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-
-          // middle rung front
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-
-          // left column back
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-
-          // top rung back
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-
-          // middle rung back
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-
-          // top
-        70, 200, 210,
-        70, 200, 210,
-        70, 200, 210,
-        70, 200, 210,
-        70, 200, 210,
-        70, 200, 210,
-
-          // top rung right
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-
-          // under top rung
-        210, 100, 70,
-        210, 100, 70,
-        210, 100, 70,
-        210, 100, 70,
-        210, 100, 70,
-        210, 100, 70,
-
-          // between top rung and middle
-        210, 160, 70,
-        210, 160, 70,
-        210, 160, 70,
-        210, 160, 70,
-        210, 160, 70,
-        210, 160, 70,
-
-          // top of middle rung
-        70, 180, 210,
-        70, 180, 210,
-        70, 180, 210,
-        70, 180, 210,
-        70, 180, 210,
-        70, 180, 210,
-
-          // right of middle rung
-        100, 70, 210,
-        100, 70, 210,
-        100, 70, 210,
-        100, 70, 210,
-        100, 70, 210,
-        100, 70, 210,
-
-          // bottom of middle rung.
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-
-          // right of bottom
-        140, 210, 80,
-        140, 210, 80,
-        140, 210, 80,
-        140, 210, 80,
-        140, 210, 80,
-        140, 210, 80,
-
-          // bottom
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-
-          // left side
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-                // bottom
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                        // bottom
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-                // bottom
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                        // bottom
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-                // bottom
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                90, 130, 110,
-                        // left column front
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-
-          // top rung front
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-        200,  70, 120,
-
-          // left column front
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-  
-            // top rung front
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          // left column front
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-  
-            // top rung front
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          // left column front
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-          200,  70, 120,
-            ]),
-      gl.STATIC_DRAW);
-}
-
-  let choords = [
+let choords = [
     // left column
     //1
     0, 0, 0,
