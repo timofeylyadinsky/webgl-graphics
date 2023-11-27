@@ -66,34 +66,37 @@
   </table>
   <script  id="vertex-shader-3d" type="notjs">
     attribute vec4 a_position;
-attribute vec3 a_normal;
+    attribute vec3 a_normal;
 
-uniform vec3 u_lightWorldPosition[2];
+    uniform vec3 u_lightWorldPosition[2];
+    uniform vec3 u_viewWorldPosition;
 
-uniform mat4 u_world;
-uniform mat4 u_worldViewProjection;
-uniform mat4 u_worldInverseTranspose;
+    uniform mat4 u_world;
+    uniform mat4 u_worldViewProjection;
+    uniform mat4 u_worldInverseTranspose;
 
-varying vec3 v_normal;
+    varying vec3 v_normal;
 
-varying vec3 v_surfaceToLight;
-varying vec3 v_surfaceToLight2;
+    varying vec3 v_surfaceToLight;
+    varying vec3 v_surfaceToLight2;
+    varying vec3 v_surfaceToView;
 
-void main() {
-  // Multiply the position by the matrix.
-  gl_Position = u_worldViewProjection * a_position;
+    void main() {
+    // Multiply the position by the matrix.
+    gl_Position = u_worldViewProjection * a_position;
 
-  // orient the normals and pass to the fragment shader
-  v_normal = mat3(u_worldInverseTranspose) * a_normal;
+    // orient the normals and pass to the fragment shader
+    v_normal = mat3(u_worldInverseTranspose) * a_normal;
 
-  // compute the world position of the surfoace
-  vec3 surfaceWorldPosition = (u_world * a_position).xyz;
+    // compute the world position of the surfoace
+    vec3 surfaceWorldPosition = (u_world * a_position).xyz;
 
-  // compute the vector of the surface to the light
-  // and pass it to the fragment shader
-  // v_surfaceToLight = dot(u_lightWorldPosition[0], u_lightWorldPosition[1]) - surfaceWorldPosition;
-  v_surfaceToLight = u_lightWorldPosition[0] - surfaceWorldPosition;
-  v_surfaceToLight2 = u_lightWorldPosition[1] - surfaceWorldPosition;
+    // compute the vector of the surface to the light
+    // and pass it to the fragment shader
+    // v_surfaceToLight = dot(u_lightWorldPosition[0], u_lightWorldPosition[1]) - surfaceWorldPosition;
+    v_surfaceToLight = u_lightWorldPosition[0] - surfaceWorldPosition;
+    v_surfaceToLight2 = u_lightWorldPosition[1] - surfaceWorldPosition;
+    v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
 }
   </script>
   <script  id="fragment-shader-3d" type="notjs">
@@ -103,9 +106,11 @@ void main() {
     varying vec3 v_normal;
     varying vec3 v_surfaceToLight;
     varying vec3 v_surfaceToLight2;
+    varying vec3 v_surfaceToView;
 
     
     uniform vec4 u_color;
+    uniform float u_shininess;
     
     void main() {
       // because v_normal is a varying it's interpolated
@@ -115,9 +120,17 @@ void main() {
     
       vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
       vec3 surfaceToLightDirection2 = normalize(v_surfaceToLight2);
+
+      vec3 surfaceToViewDirection = normalize(v_surfaceToView);
+      vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
     
       float light = dot(normal, surfaceToLightDirection);
       float light2 = dot(normal, surfaceToLightDirection2);
+
+      float specular = 0.0;
+      if (light > 0.0) {
+        specular = pow(dot(normal, halfVector), u_shininess);
+      }
     
       gl_FragColor = u_color;
     
@@ -127,7 +140,7 @@ void main() {
       //gl_FragColor.rgb *= light * u_lightColor;
 
       //gl_FragColor.rgb *= light2;
-      gl_FragColor.rgb = color;
+      gl_FragColor.rgb = color;// + specular; //+ specular;
     }
   </script>
   <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>

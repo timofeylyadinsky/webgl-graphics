@@ -75,7 +75,10 @@ function start() {
 
   let lightWorldPositionLocation = gl.getUniformLocation(program, "u_lightWorldPosition[0]");
   let lightWorldPositionLocation2 = gl.getUniformLocation(program, "u_lightWorldPosition[1]");
+  let viewWorldPositionLocation = gl.getUniformLocation(program, "u_viewWorldPosition");
   let worldLocation = gl.getUniformLocation(program, "u_world");
+  let shininessLocation = gl.getUniformLocation(program, "u_shininess");
+
   
   // Position Buffer
   let positionBuffer = gl.createBuffer();
@@ -87,9 +90,10 @@ function start() {
   setNormals(gl);
 
   //let translation = [-150, 0, -360];
-  //let rotation = [degToRad(40), degToRad(25), degToRad(325)];
+  let rotation = [degToRad(40), degToRad(40), degToRad(40)];
   let fieldOfViewRadians = degToRad(60);
   let fRotationRadians = 0;
+  let rotationSpeed = 1.2;
 
 
   fieldOfView.value = radToDeg(fieldOfViewRadians);
@@ -101,9 +105,14 @@ function start() {
     drawScene();
   }
 
-  drawScene();
+  let then = 0;
+  requestAnimationFrame(drawScene);
 
-  function drawScene() {
+  function drawScene(now) {
+    now*=0.001
+    let delta = now - then;
+    then = now;
+    rotation[0] += rotationSpeed * delta;
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -163,16 +172,24 @@ function start() {
     // Make a view matrix from the camera matrix.
     var viewMatrix = m4.inverse(cameraMatrix);
 
+
     // Compute a view projection matrix
     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-    var worldMatrix = m4.yRotation(fRotationRadians);
+    let worldMatrix = m4.xRotation(fRotationRadians);
 
+    worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
+
+    worldMatrix = m4.yRotate(worldMatrix, rotation[1]);
+ 
+    worldMatrix = m4.zRotate(worldMatrix, rotation[2]);
+    //console.log(rotation)
+    //let worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
     // Multiply the matrices.
     var worldViewProjectionMatrix = m4.multiply(viewProjectionMatrix, worldMatrix);
     var worldInverseMatrix = m4.inverse(worldMatrix);
     var worldInverseTransposeMatrix = m4.transpose(worldInverseMatrix);
-
+    //worldInverseTransposeMatrix = m4.xRotate(worldInverseTransposeMatrix, rotation[0])
     // Set the matrices
     gl.uniformMatrix4fv(worldViewProjectionLocation, false, worldViewProjectionMatrix);
     gl.uniformMatrix4fv(worldInverseTransposeLocation, false, worldInverseTransposeMatrix);
@@ -183,13 +200,17 @@ function start() {
     //gl.uniform3fv(lightColorLocation, m4.normalize([1, 0.6, 0.6]));
 
     //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
-    gl.uniform3fv(lightWorldPositionLocation, [10, 20, 30]);
-    gl.uniform3fv(lightWorldPositionLocation2, [90, 20, 10]);
+    gl.uniform3fv(lightWorldPositionLocation, [10, 30, 40]);
+    gl.uniform3fv(lightWorldPositionLocation2, [150, 20, 150]);
+
+    gl.uniform3fv(viewWorldPositionLocation, camera);
+    gl.uniform1f(shininessLocation, 400);
 
     // Draw the geometry.
     let primitiveType = gl.TRIANGLES;
     let count = choords.length/2;
     gl.drawArrays(primitiveType, offset, count);
+    requestAnimationFrame(drawScene);
   }
 
   console.log("print")
@@ -335,12 +356,14 @@ let choords = [
     //First Bottom First Vertical
     // //3
     0, 150, 30,
-    0, 150, 0,
     30, 150, 0,
+    0, 150, 0,
+
     //4
     0, 150, 30,
-    30,150, 0,
     30, 150, 30,
+    30,150, 0,
+
     //First Top First Vertical
     //3
     0, 0, 30,
@@ -386,12 +409,14 @@ let choords = [
     //Middle Bottom
     // //11
     30, 90, 30,
-    30, 90, 0,
     60, 90, 0,
+    30, 90, 0,
+
     //12
     60, 90, 0,
-    60, 90, 30,
     30, 90, 30,
+    60, 90, 30,
+
 
     //Middle Top
     //13
@@ -407,12 +432,14 @@ let choords = [
     //Last Bottom O outer
     // //15
     150, 150, 30,
-    60, 150, 0,
     150, 150, 0,
+    60, 150, 0,
+
     //16
     60, 150, 0,
-    150, 150, 30,
     60, 150, 30,
+    150, 150, 30,
+
 
     //Last Top O Outer
     //17
