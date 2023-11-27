@@ -81,16 +81,8 @@ function start() {
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   setGeometry(gl)
   
-
-  // // Create a buffer to put colors in
-  // let colorBuffer = gl.createBuffer();
-  // gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer); 
-  // setColors(gl);
-  // Create a buffer to put normals in
   let normalBuffer = gl.createBuffer();
-  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = normalBuffer)
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-  // Put normals data into buffer
   setNormals(gl);
 
   //let translation = [-150, 0, -360];
@@ -172,12 +164,9 @@ function start() {
     // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    // Clear the canvas.
     gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.enable(gl.CULL_FACE);
-    //will be culled.
+
     gl.enable(gl.CULL_FACE);
-    // Enable the depth buffer
     gl.enable(gl.DEPTH_TEST);
 
     // Tell it to use our program (pair of shaders)
@@ -188,11 +177,9 @@ function start() {
 
     // Bind the position buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    // Задаём fudgeFactor
-   //gl.uniform1f(fudgeLocation, fudgeFactor);
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    let size = 3;          // 2 components per iteration
+    let size = 3;          
     let type = gl.FLOAT;   // the data is 32bit floats
     let normalize = false; // don't normalize the data
     let stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
@@ -200,13 +187,10 @@ function start() {
     
     gl.vertexAttribPointer(positionLocation, size, type, normalize, stride, offset);
 
-    // Turn on the color attribute
     gl.enableVertexAttribArray(normalLocation);
 
-    // Bind the color buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
 
-    // Tell the attribute how to get data out of colorBuffer (ARRAY_BUFFER)
     size = 3;                 // 3 components per iteration
     type = gl.FLOAT;  // the data is 8bit unsigned values
     normalize = false;         // normalize the data (convert from 0-255 to 0-1)
@@ -227,7 +211,7 @@ function start() {
 
 
     // Compute the camera's matrix
-    var camera = [100, 150, 200];
+    var camera = [100, 150, 400];
     var target = [0, 35, 0];
     var up = [0, 1, 0];
     var cameraMatrix = m4.lookAt(camera, target, up);
@@ -238,7 +222,6 @@ function start() {
     // Compute a view projection matrix
     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-    // Draw a F at the origin
     var worldMatrix = m4.yRotation(fRotationRadians);
 
     // Multiply the matrices.
@@ -252,13 +235,9 @@ function start() {
     gl.uniformMatrix4fv(worldLocation, false, worldMatrix);
 
     // Set the color to use
-    gl.uniform4fv(colorLocation, [0.2, 1, 0.2, 1]); // green
+    gl.uniform4fv(colorLocation, [0.9, 1, 0.5, 1]); // green
 
-    // set the light position
-    gl.uniform3fv(lightWorldPositionLocation, [20, 30, 60]);
-
-    // // Set the matrix.
-    // gl.uniformMatrix4fv(matrixLocation, false, matrix);
+    gl.uniform3fv(lightWorldPositionLocation, [20, 100, 100]);
 
     // Draw the geometry.
     let primitiveType = gl.TRIANGLES;
@@ -542,11 +521,12 @@ let choords = [
 ]
 
 function setGeometry(gl) {
-  var matrix = m4.xRotation(Math.PI);
+  let matrix = m4.xRotation(Math.PI);
+  //matrix = m4.translate(matrix, -50, -75, -15);
   matrix = m4.translate(matrix, -50, -75, -15);
 
-  for (var ii = 0; ii < choords.length; ii += 3) {
-    var vector = m4.transformPoint(matrix, [choords[ii + 0], choords[ii + 1], choords[ii + 2], 1]);
+  for (let ii = 0; ii < choords.length; ii += 3) {
+    let vector = m4.transformPoint(matrix, [choords[ii + 0], choords[ii + 1], choords[ii + 2], 1]);
     choords[ii + 0] = vector[0];
     choords[ii + 1] = vector[1];
     choords[ii + 2] = vector[2];
