@@ -68,7 +68,7 @@
     attribute vec4 a_position;
 attribute vec3 a_normal;
 
-uniform vec3 u_lightWorldPosition;
+uniform vec3 u_lightWorldPosition[2];
 
 uniform mat4 u_world;
 uniform mat4 u_worldViewProjection;
@@ -77,6 +77,7 @@ uniform mat4 u_worldInverseTranspose;
 varying vec3 v_normal;
 
 varying vec3 v_surfaceToLight;
+varying vec3 v_surfaceToLight2;
 
 void main() {
   // Multiply the position by the matrix.
@@ -90,7 +91,9 @@ void main() {
 
   // compute the vector of the surface to the light
   // and pass it to the fragment shader
-  v_surfaceToLight = u_lightWorldPosition - surfaceWorldPosition;
+  // v_surfaceToLight = dot(u_lightWorldPosition[0], u_lightWorldPosition[1]) - surfaceWorldPosition;
+  v_surfaceToLight = u_lightWorldPosition[0] - surfaceWorldPosition;
+  v_surfaceToLight2 = u_lightWorldPosition[1] - surfaceWorldPosition;
 }
   </script>
   <script  id="fragment-shader-3d" type="notjs">
@@ -99,6 +102,8 @@ void main() {
     // Passed in from the vertex shader.
     varying vec3 v_normal;
     varying vec3 v_surfaceToLight;
+    varying vec3 v_surfaceToLight2;
+
     
     uniform vec4 u_color;
     
@@ -109,14 +114,20 @@ void main() {
       vec3 normal = normalize(v_normal);
     
       vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
+      vec3 surfaceToLightDirection2 = normalize(v_surfaceToLight2);
     
       float light = dot(normal, surfaceToLightDirection);
+      float light2 = dot(normal, surfaceToLightDirection2);
     
       gl_FragColor = u_color;
     
       // Lets multiply just the color portion (not the alpha)
       // by the light
-      gl_FragColor.rgb *= light;
+      vec3 color = gl_FragColor.rgb * light + gl_FragColor.rgb * light2;
+      //gl_FragColor.rgb *= light * u_lightColor;
+
+      //gl_FragColor.rgb *= light2;
+      gl_FragColor.rgb = color;
     }
   </script>
   <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>

@@ -73,7 +73,8 @@ function start() {
   let worldInverseTransposeLocation = gl.getUniformLocation(program, "u_worldInverseTranspose");
   let colorLocation = gl.getUniformLocation(program, "u_color");
 
-  let lightWorldPositionLocation = gl.getUniformLocation(program, "u_lightWorldPosition");
+  let lightWorldPositionLocation = gl.getUniformLocation(program, "u_lightWorldPosition[0]");
+  let lightWorldPositionLocation2 = gl.getUniformLocation(program, "u_lightWorldPosition[1]");
   let worldLocation = gl.getUniformLocation(program, "u_world");
   
   // Position Buffer
@@ -99,8 +100,8 @@ function start() {
   // let positionZ = document.getElementById("moveZ");
   // let fieldOfView = document.getElementById("fieldOfView");
   fieldOfView.value = radToDeg(fieldOfViewRadians);
-  fieldOfView.min = -360;
-  fieldOfView.max = 360;
+  fieldOfView.min = -720;
+  fieldOfView.max = 720;
   // angleX.value = rotation[0];
   // angleX.min = 0;
   // angleX.max = 360;
@@ -211,7 +212,7 @@ function start() {
 
 
     // Compute the camera's matrix
-    var camera = [100, 150, 400];
+    var camera = [100, 150, 300];
     var target = [0, 35, 0];
     var up = [0, 1, 0];
     var cameraMatrix = m4.lookAt(camera, target, up);
@@ -235,9 +236,12 @@ function start() {
     gl.uniformMatrix4fv(worldLocation, false, worldMatrix);
 
     // Set the color to use
-    gl.uniform4fv(colorLocation, [0.9, 1, 0.5, 1]); // green
+    gl.uniform4fv(colorLocation, [0.1, 1, 0.1, 1]);
+    //gl.uniform3fv(lightColorLocation, m4.normalize([1, 0.6, 0.6]));
 
-    gl.uniform3fv(lightWorldPositionLocation, [20, 100, 100]);
+    //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
+    gl.uniform3fv(lightWorldPositionLocation, [10, 20, 30]);
+    gl.uniform3fv(lightWorldPositionLocation2, [100, 20, 10]);
 
     // Draw the geometry.
     let primitiveType = gl.TRIANGLES;
