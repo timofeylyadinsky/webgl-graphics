@@ -92,71 +92,14 @@ function start() {
   let fRotationRadians = 0;
 
 
-  // let angleX = document.getElementById("angleX");
-  // let angleY = document.getElementById("angleY");
-  // let angleZ = document.getElementById("angleZ");
-  // let positionX = document.getElementById("moveX");
-  // let positionY = document.getElementById("moveY");
-  // let positionZ = document.getElementById("moveZ");
-  // let fieldOfView = document.getElementById("fieldOfView");
   fieldOfView.value = radToDeg(fieldOfViewRadians);
   fieldOfView.min = -720;
   fieldOfView.max = 720;
-  // angleX.value = rotation[0];
-  // angleX.min = 0;
-  // angleX.max = 360;
-  // angleY.value = rotation[1];
-  // angleY.min = 0;
-  // angleY.max = 360;
-  // angleZ.value = rotation[2];
-  // angleZ.min = 0;
-  // angleZ.max = 360;
-  // angleX.oninput = function() {
-  //   updateAngle(0, angleX)
-  // }
-  // angleY.oninput = function() {
-  //   updateAngle(1, angleY)
-  // } 
-  // angleZ.oninput = function() {
-  //   updateAngle(2, angleZ)
-  // }
 
-  // positionX.value = translation[0];
-  // positionY.value = translation[1];
-  // positionZ.value = translation[2];
-  // positionX.min = -200;
-  // positionY.min = -200;
-  // positionZ.min = -1000;
-  // positionX.max = canvas.width;
-  // positionY.max = canvas.height;
-  // positionZ.max = 0;
-
-  // positionX.oninput = function() {
-  //   updatePosition(0, positionX)  
-  // }
-  // positionY.oninput = function() {
-  //   updatePosition(1, positionY)  
-  // }
-  // positionZ.oninput = function() {
-  //   updatePosition(2, positionZ)  
-  // }
   fieldOfView.oninput = function() {
     fRotationRadians = degToRad(fieldOfView.value);
     drawScene();
   }
-
-  // function updatePosition(index, ui) {
-  //   translation[index] = ui.value;
-  //   drawScene();
-  // }
-  // function updateAngle(index, ui) {
-  //   let angleInDegrees = ui.value;
-  //   let angleInRadians = angleInDegrees * Math.PI / 180;
-  //   rotation[index] = angleInRadians;
-  //   drawScene();
-  // }
-
-
 
   drawScene();
 
@@ -241,7 +184,7 @@ function start() {
 
     //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
     gl.uniform3fv(lightWorldPositionLocation, [10, 20, 30]);
-    gl.uniform3fv(lightWorldPositionLocation2, [100, 20, 10]);
+    gl.uniform3fv(lightWorldPositionLocation2, [90, 20, 10]);
 
     // Draw the geometry.
     let primitiveType = gl.TRIANGLES;
@@ -251,10 +194,6 @@ function start() {
 
   console.log("print")
 }
-
-
-
-
 
   function radToDeg(r) {
     return r * 180 / Math.PI;
