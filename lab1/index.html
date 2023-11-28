@@ -133,6 +133,7 @@
 
       vec3 surfaceToViewDirection = normalize(v_surfaceToView);
       vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
+      vec3 halfVector2 = normalize(surfaceToLightDirection2 + surfaceToViewDirection);
     
       float light = dot(normal, surfaceToLightDirection);
       float light2 = dot(normal, surfaceToLightDirection2);
@@ -140,6 +141,12 @@
       float specular = 0.0;
       if (light > 0.0) {
         specular = pow(dot(normal, halfVector), u_shininess);
+      }
+
+      
+      float specular2 = 0.0;
+      if (light2 > 0.0) {
+        specular2 = pow(dot(normal, halfVector2), u_shininess);
       }
     
       gl_FragColor = texture2D(u_texture, v_texcoord);
@@ -149,7 +156,7 @@
       // by the light
       vec3 color = gl_FragColor.rgb * light + gl_FragColor.rgb * light2;
       //gl_FragColor.rgb *= light * u_lightColor;
-      gl_FragColor.rgb += color;
+      gl_FragColor.rgb += color + specular + specular2;
       //gl_FragColor.rgb *= light2;
       //gl_FragColor.rgb = color + specular;// + specular2;
     }

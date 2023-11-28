@@ -102,7 +102,7 @@ function start() {
                 new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
   let image = new Image();
-  image.src = "./texture3.jpg";
+  image.src = "./texture4.jpg";
   image.crossOrigin = "anonymous";
   image.addEventListener('load', function() {
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -274,11 +274,11 @@ function start() {
     gl.uniform4fv(colorLocation, [0.1, 1, 0.1, 1]);
 
     //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
-    gl.uniform3fv(lightWorldPositionLocation, [-30, 10, 40]);
-    gl.uniform3fv(lightWorldPositionLocation, [150, 20, 160]);
+    gl.uniform3fv(lightWorldPositionLocation, [-10, 10, 40]);
+    gl.uniform3fv(lightWorldPositionLocation2, [90, 20, 160]);
 
     gl.uniform3fv(viewWorldPositionLocation, camera);
-    gl.uniform1f(shininessLocation, 1000);
+    gl.uniform1f(shininessLocation, 200);
     gl.uniform1i(textureLocation, 0);
 
     // Draw the geometry.
