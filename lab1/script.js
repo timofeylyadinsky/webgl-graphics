@@ -126,8 +126,7 @@ function start() {
 
 
   let then = 0;
-  //requestAnimationFrame(drawScene);
-  drawScene(then)
+  //drawScene(then)
   document.addEventListener('keydown', function(event){
     console.log(event.key)
     if(event.key === 'Enter') {
@@ -137,22 +136,22 @@ function start() {
         requestAnimationFrame(drawScene);
       animationKey = !animationKey;
     } else if (event.key === 'ArrowLeft') {
-      rotation[0] += degToRad(3);
-      requestAnimationFrame(drawScene);
-      //drawScene(then)
-    }
-    else if (event.key === 'ArrowRight') {
       rotation[0] -= degToRad(3);
       requestAnimationFrame(drawScene);
       //drawScene(then)
     }
+    else if (event.key === 'ArrowRight') {
+      rotation[0] += degToRad(3);
+      requestAnimationFrame(drawScene);
+      //drawScene(then)
+    }
     else if (event.key === 'ArrowUp') {
-      rotation[1] -= degToRad(3);
+      rotation[1] += degToRad(3);
       requestAnimationFrame(drawScene);
       //drawScene(then)
     }
     else if (event.key === 'ArrowDown') {
-      rotation[1] += degToRad(3);
+      rotation[1] -= degToRad(3);
       requestAnimationFrame(drawScene);
       //drawScene(then)
     }
@@ -165,12 +164,13 @@ function start() {
   } 
 
   function drawScene(now) {
+    now*=0.001
+    let delta = now - then;
+    then = now;
     if(animationKey){
-      now*=0.001
-      let delta = now - then;
-      then = now;
+      console.log("now: " + now + "\n then: " + then);
       //console.log("1: " + rotation);
-      console.log(delta);
+
       rotation[0] += rotationSpeed * delta;
       rotation[1] += rotationSpeed * delta;
       //console.log("2: " + rotation);
@@ -771,12 +771,20 @@ function setNormals(gl) {
          -1, 0, 0,
 
          //23 24
-         1, 0, 0,
-         1, 0, 0,
-         1, 0, 0,
-         1, 0, 0,
-         1, 0, 0,
-         1, 0, 0,  
+         -1, 0, 0,
+         -1, 0, 0,
+         -1, 0, 0,
+         -1, 0, 0,
+         -1, 0, 0,
+         -1, 0, 0,  
+         
+        //27 28
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
         //25 26
         0, -1, 0,
         0, -1, 0,
@@ -785,13 +793,6 @@ function setNormals(gl) {
         0, -1, 0,
         0, -1, 0,
 
-      //27 28
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
 
  
 ]);
@@ -994,6 +995,7 @@ function setTextureCoords(gl) {
         0, 0,
         1, 0,
         1, 1,
+
 
         //Bottom O inner
         0, 0,
