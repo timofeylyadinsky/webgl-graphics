@@ -82,6 +82,10 @@ function start() {
   let shininessLocation = gl.getUniformLocation(program, "u_shininess");
   let textureLocation = gl.getUniformLocation(program, "u_texture");
 
+  let lightColorLocation = gl.getUniformLocation(program, "u_lightColor[0]");
+  let specularColorLocation = gl.getUniformLocation(program, "u_specularColor[0]");
+  let lightColorLocation2 = gl.getUniformLocation(program, "u_lightColor[1]");
+  let specularColorLocation2 = gl.getUniformLocation(program, "u_specularColor[1]");
   
   // Position Buffer
   let positionBuffer = gl.createBuffer();
@@ -102,7 +106,7 @@ function start() {
                 new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
   let image = new Image();
-  image.src = "./texture4.jpg";
+  image.src = "./texture7.jpg";
   image.crossOrigin = "anonymous";
   image.addEventListener('load', function() {
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -274,8 +278,17 @@ function start() {
     gl.uniform4fv(colorLocation, [0.1, 1, 0.1, 1]);
 
     //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
-    gl.uniform3fv(lightWorldPositionLocation, [-10, 10, 40]);
-    gl.uniform3fv(lightWorldPositionLocation2, [90, 20, 160]);
+    // gl.uniform3fv(lightWorldPositionLocation, [0, 30, 100]);
+    // gl.uniform3fv(lightWorldPositionLocation2, [90, 30, 110]);
+
+    gl.uniform3fv(lightWorldPositionLocation, [0, 30, 100]);
+    gl.uniform3fv(lightWorldPositionLocation2, [60, 60, 110]);
+
+    gl.uniform3fv(lightColorLocation, m4.normalize([0.1, 0.1, 1]));
+    gl.uniform3fv(specularColorLocation, m4.normalize([0.1, 0.1, 1]));
+
+    gl.uniform3fv(lightColorLocation2, m4.normalize([1, 0.1, 0.1]));
+    gl.uniform3fv(specularColorLocation2, m4.normalize([1, 0.1, 0.1]));
 
     gl.uniform3fv(viewWorldPositionLocation, camera);
     gl.uniform1f(shininessLocation, 200);
@@ -324,23 +337,27 @@ let choords = [
 
     //Top Front O
     //5
+    120, 30, 0,//1
+    120, 0, 0,//2
+    90, 30, 0,//3
+    //6
     120, 0, 0,
     90, 0, 0,
     90, 30, 0,
-    //6
-    90, 30, 0,
-    120, 30, 0,
-    120, 0, 0,
+
+
 
     //LEFT FRONT O
     //7
-    90,0, 0,
-    60,150, 0,
     90,150, 0,
-    //8
-    60,0, 0,
-    60,150, 0,
     90,0, 0,
+    60,150, 0,
+
+    //8
+    90,0, 0, //1
+    60,0, 0, //2
+    60,150, 0, //3
+
 
     //Bottom FRONT O
     //9
@@ -384,23 +401,26 @@ let choords = [
     60, 60, 30,
     60, 90, 30,
 
-    //Bottom
+    //Top
     //5
-    120, 0, 30,
-    90, 30, 30,
-    90, 0, 30,
+    90, 0, 30,//1
+    120, 0, 30,//2
+    90, 30, 30,//3
     //6
     90, 30, 30,
     120, 0, 30,
     120, 30, 30,
-    //7
-    90,0, 30,
-    90,150, 30,
-    60,150, 30,
+    //left back outer
     //8
     60,0, 30,
     90,0, 30,
     60,150, 30,
+    //7
+    60,150, 30,//1
+    90,0, 30,//2
+    90,150, 30,//3
+
+    //Bottom
     //9
     90,120, 30,
     120,120, 30,
@@ -409,14 +429,16 @@ let choords = [
     90,150, 30,
     120,120, 30,
     120,150, 30,
+    //Right
     //11
-    150,150, 30,
-    120,150, 30,
-    150,0, 30,
-    //12
     120,0, 30,
     150,0, 30,
     120,150, 30,
+    //12
+    120,150, 30,//1
+    150,0, 30,//2
+    150,150, 30,//3
+
 
     //Filling
     //First Vertical
@@ -903,17 +925,16 @@ function setTextureCoords(gl) {
         //filling
         // First Vertical
         0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
         1, 1,
+        1, 0,
+        // first bottom
+        0, 1,
         1, 0,
         0, 0,
         0, 1,
-        1, 1,
-
-        // first bottom
-        0, 0,
-        0, 1,
-        1, 1,
-        0, 0,
         1, 1,
         1, 0,
 
@@ -927,91 +948,91 @@ function setTextureCoords(gl) {
 
         // Second Vertical
         0, 0,
+        1, 0,
         0, 1,
         1, 1,
-        0, 0,
-        1, 1,
+        0, 1,
         1, 0,
 
         // Left vertical O outer
         0, 0,
         0, 1,
-        1, 1,
-        0, 0,
+        1, 0,
         1, 1,
         1, 0,
+        0, 1,
 
         // right Vertical O outer
         0, 0,
+        1, 0,
+        0, 1,
         1, 1,
         0, 1,
-        0, 0,
         1, 0,
-        1, 1,
 
         // Middle Bottom
+        0, 1,
+        1, 0,
         0, 0,
         0, 1,
-        1, 1,
-        0, 0,
-        1, 1,
         1, 0,
+        1, 1,
 
         // Middle Top
-        0, 0,
-        1, 1,
         0, 1,
         0, 0,
         1, 0,
+        1, 0,
         1, 1,
+        0, 1,
         // Last Bottom O outer
+        1, 1,
+        1, 0,
+        0, 0,
         0, 0,
         0, 1,
         1, 1,
-        0, 0,
-        1, 1,
-        1, 0,
 
         // Last Top O outer
+        1, 1,
+        0, 0,
+        1, 0,
         0, 0,
         1, 1,
         0, 1,
-        0, 0,
-        1, 0,
-        1, 1,
 
         // Left O Inner
         0, 0,
-        0, 1,
-        1, 1,
-        0, 0,
-        1, 1,
         1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
 
         //Right O Inner
         0, 0,
-        1, 1,
         0, 1,
-        0, 0,
         1, 0,
+        0, 1,
         1, 1,
+        1, 0,
 
 
         //Bottom O inner
         0, 0,
-        0, 1,
-        1, 1,
-        0, 0,
-        1, 1,
         1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
 
         // Top O inner
         0, 0,
-        1, 1,
         0, 1,
-        0, 0,
         1, 0,
+        0, 1,
         1, 1,
+        1, 0,
 ]),
       gl.STATIC_DRAW);
 }

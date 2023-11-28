@@ -89,15 +89,10 @@
     // Multiply the position by the matrix.
     gl_Position = u_worldViewProjection * a_position;
 
-    // orient the normals and pass to the fragment shader
     v_normal = mat3(u_worldInverseTranspose) * a_normal;
 
-    // compute the world position of the surfoace
     vec3 surfaceWorldPosition = (u_world * a_position).xyz;
 
-    // compute the vector of the surface to the light
-    // and pass it to the fragment shader
-    // v_surfaceToLight = dot(u_lightWorldPosition[0], u_lightWorldPosition[1]) - surfaceWorldPosition;
     v_surfaceToLight = u_lightWorldPosition[0] - surfaceWorldPosition;
     v_surfaceToLight2 = u_lightWorldPosition[1] - surfaceWorldPosition;
     v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
@@ -120,8 +115,10 @@
     
     uniform vec4 u_color;
     uniform float u_shininess;
-    
-    
+
+    uniform vec3 u_lightColor[2];
+    uniform vec3 u_specularColor[2];
+        
     void main() {
       // because v_normal is a varying it's interpolated
       // so it will not be a unit vector. Normalizing it
@@ -150,13 +147,9 @@
       }
     
       gl_FragColor = texture2D(u_texture, v_texcoord);
-      //gl_FragColor = u_color;
     
-      // Lets multiply just the color portion (not the alpha)
-      // by the light
-      vec3 color = gl_FragColor.rgb * light + gl_FragColor.rgb * light2;
-      //gl_FragColor.rgb *= light * u_lightColor;
-      gl_FragColor.rgb += color + specular + specular2;
+      vec3 color = gl_FragColor.rgb * light * u_lightColor[0]  + gl_FragColor.rgb * light2 * u_lightColor[1];
+      gl_FragColor.rgb += color + specular * u_specularColor[0] + specular2 * u_specularColor[1];
       //gl_FragColor.rgb *= light2;
       //gl_FragColor.rgb = color + specular;// + specular2;
     }
