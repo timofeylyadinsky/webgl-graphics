@@ -129,11 +129,32 @@ function start() {
   //requestAnimationFrame(drawScene);
   drawScene(then)
   document.addEventListener('keydown', function(event){
+    console.log(event.key)
     if(event.key === 'Enter') {
       console.log(event.key)
+      //then = 0;
       if(!animationKey)
         requestAnimationFrame(drawScene);
       animationKey = !animationKey;
+    } else if (event.key === 'ArrowLeft') {
+      rotation[0] += degToRad(3);
+      requestAnimationFrame(drawScene);
+      //drawScene(then)
+    }
+    else if (event.key === 'ArrowRight') {
+      rotation[0] -= degToRad(3);
+      requestAnimationFrame(drawScene);
+      //drawScene(then)
+    }
+    else if (event.key === 'ArrowUp') {
+      rotation[1] -= degToRad(3);
+      requestAnimationFrame(drawScene);
+      //drawScene(then)
+    }
+    else if (event.key === 'ArrowDown') {
+      rotation[1] += degToRad(3);
+      requestAnimationFrame(drawScene);
+      //drawScene(then)
     }
   })
 
@@ -148,10 +169,13 @@ function start() {
       now*=0.001
       let delta = now - then;
       then = now;
+      //console.log("1: " + rotation);
+      console.log(delta);
       rotation[0] += rotationSpeed * delta;
       rotation[1] += rotationSpeed * delta;
+      //console.log("2: " + rotation);
     }
-    console.log(rotation);
+    //console.log(rotation);
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -172,34 +196,29 @@ function start() {
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
     let size = 3;          
-    let type = gl.FLOAT;   // the data is 32bit floats
-    let normalize = false; // don't normalize the data
-    let stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    let offset = 0;        // start at the beginning of the buffer
-    
+    let type = gl.FLOAT;
+    let normalize = false;
+    let stride = 0;       
+    let offset = 0;    
     gl.vertexAttribPointer(positionLocation, size, type, normalize, stride, offset);
 
     gl.enableVertexAttribArray(normalLocation);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-
-    size = 3;                 // 3 components per iteration
-    type = gl.FLOAT;  // the data is 8bit unsigned values
-    normalize = false;         // normalize the data (convert from 0-255 to 0-1)
-    stride = 0;               // 0 = move forward size * sizeof(type) each iteration to get the next position
-    offset = 0;               // start at the beginning of the buffer
+    size = 3; 
+    type = gl.FLOAT;
+    normalize = false; 
+    stride = 0;
+    offset = 0;
     gl.vertexAttribPointer(normalLocation, size, type, normalize, stride, offset);
 
-    // Turn on the texcoord attribute
+
     gl.enableVertexAttribArray(texcoordLocation);
-    // bind the texcoord buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-    // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
-    size = 2;          // 2 components per iteration
-    type = gl.FLOAT;   // the data is 32bit floats
-    normalize = false; // don't normalize the data
-    stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    offset = 0;        // start at the beginning of the buffer
+    size = 2;
+    type = gl.FLOAT;
+    normalize = false;
+    stride = 0;
+    offset = 0;
     gl.vertexAttribPointer(texcoordLocation, size, type, normalize, stride, offset);
 
 
@@ -222,15 +241,16 @@ function start() {
 
     // Make a view matrix from the camera matrix.
     var viewMatrix = m4.inverse(cameraMatrix);
+    //console.log("3: " + rotation);
 
 
     // Compute a view projection matrix
     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-    let worldMatrix = m4.yRotation(fRotationRadians);
-    
-    worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
+    // let worldMatrix = m4.xRotation(fRotationRadians);
+    let worldMatrix = m4.xRotation(rotation[0]);
     worldMatrix = m4.yRotate(worldMatrix, rotation[1]);
+    worldMatrix = m4.zRotate(worldMatrix, rotation[2]);
   
 
     //worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
@@ -268,7 +288,6 @@ function start() {
     if(animationKey){
       requestAnimationFrame(drawScene);
     }
-    //requestAnimationFrame(drawScene);
   }
 
   console.log("print")
