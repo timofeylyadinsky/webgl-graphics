@@ -40,8 +40,6 @@ function initWebGL(canvas) {
   return gl;
 }
 
-
-
 function start() {
   let canvas = document.getElementById("canvas");
 
@@ -55,12 +53,9 @@ function start() {
   } else {
     return;
   }
-
-
   // Get the strings for our GLSL shaders
   let vertexShaderSource = document.querySelector("#vertex-shader-3d").text;
   let fragmentShaderSource = document.querySelector("#fragment-shader-3d").text;
- 
   // create GLSL shaders, upload the GLSL source, compile the shaders
   let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -70,40 +65,33 @@ function start() {
   let normalLocation = gl.getAttribLocation(program, "a_normal");
   let texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
   
-  // lookup uniforms
   let worldViewProjectionLocation = gl.getUniformLocation(program, "u_worldViewProjection");
   let worldInverseTransposeLocation = gl.getUniformLocation(program, "u_worldInverseTranspose");
   let colorLocation = gl.getUniformLocation(program, "u_color");
-
   let lightWorldPositionLocation = gl.getUniformLocation(program, "u_lightWorldPosition[0]");
   let lightWorldPositionLocation2 = gl.getUniformLocation(program, "u_lightWorldPosition[1]");
   let viewWorldPositionLocation = gl.getUniformLocation(program, "u_viewWorldPosition");
   let worldLocation = gl.getUniformLocation(program, "u_world");
   let shininessLocation = gl.getUniformLocation(program, "u_shininess");
   let textureLocation = gl.getUniformLocation(program, "u_texture");
-
   let lightColorLocation = gl.getUniformLocation(program, "u_lightColor[0]");
   let specularColorLocation = gl.getUniformLocation(program, "u_specularColor[0]");
   let lightColorLocation2 = gl.getUniformLocation(program, "u_lightColor[1]");
   let specularColorLocation2 = gl.getUniformLocation(program, "u_specularColor[1]");
-  
-  // Position Buffer
+  // Buffers
   let positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   setGeometry(gl)
-  
   let normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
   setNormals(gl);
-
   let texcoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
   setTextureCoords(gl);
 
   let texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                new Uint8Array([0, 0, 255, 255]));
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
   let image = new Image();
   image.src = "./texture7.jpg";
@@ -117,23 +105,17 @@ function start() {
   //let translation = [-150, 0, -360];
   let rotation = [degToRad(40), degToRad(40), degToRad(40)];
   let fieldOfViewRadians = degToRad(60);
-  let fRotationRadians = 0;
-  let rotationSpeed = 1.2;
-
+  let rotationSpeed = [1.2, 0.9];
 
   fieldOfView.value = radToDeg(fieldOfViewRadians);
   fieldOfView.min = -720;
   fieldOfView.max = 720;
 
-
-
-
-
   let then = 0;
   drawScene(then)
   document.addEventListener('keydown', function(event){
     console.log(event.key)
-    if(event.key === 'Enter') {
+    if(event.key === 'Enter' || event.key === ' ') {
       console.log(event.key)
       //then = 0;
       if(!animationKey)
@@ -142,30 +124,20 @@ function start() {
     } else if (event.key === 'ArrowLeft') {
       rotation[0] -= degToRad(3);
       requestAnimationFrame(drawScene);
-      //drawScene(then)
     }
     else if (event.key === 'ArrowRight') {
       rotation[0] += degToRad(3);
       requestAnimationFrame(drawScene);
-      //drawScene(then)
     }
     else if (event.key === 'ArrowUp') {
       rotation[1] += degToRad(3);
       requestAnimationFrame(drawScene);
-      //drawScene(then)
     }
     else if (event.key === 'ArrowDown') {
       rotation[1] -= degToRad(3);
       requestAnimationFrame(drawScene);
-      //drawScene(then)
     }
   })
-
-  fieldOfView.oninput = function() {
-    fRotationRadians = degToRad(fieldOfView.value);
-    //requestAnimationFrame(drawScene);
-    drawScene(then);
-  } 
 
   function drawScene(now) {
     now*=0.001
@@ -173,10 +145,9 @@ function start() {
     console.log("now: " + now + "\n then: " + then);
     then = now;
     if(animationKey){
-      
       //console.log("1: " + rotation);
-      rotation[0] += rotationSpeed * delta;
-      rotation[1] += rotationSpeed * delta;
+      rotation[0] += rotationSpeed[1] * delta;
+      rotation[1] += rotationSpeed[0] * delta;
       //console.log("2: " + rotation);
     }
     //console.log(rotation);
@@ -189,16 +160,10 @@ function start() {
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
-    // Tell it to use our program (pair of shaders)
     gl.useProgram(program);
 
-    // Turn on the attribute
     gl.enableVertexAttribArray(positionLocation);
-
-    // Bind the position buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
     let size = 3;          
     let type = gl.FLOAT;
     let normalize = false;
@@ -225,19 +190,11 @@ function start() {
     offset = 0;
     gl.vertexAttribPointer(texcoordLocation, size, type, normalize, stride, offset);
 
-
-    
     let aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     let zNear = 1;
     let zFar = 2000;
     let projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
-    // matrix = m4.translate(matrix, translation[0], translation[1], translation[2]);
-    // matrix = m4.xRotate(matrix, rotation[0]);
-    // matrix = m4.yRotate(matrix, rotation[1]);
-    // matrix = m4.zRotate(matrix, rotation[2]);
 
-
-    // Compute the camera's matrix
     var camera = [100, 150, 300];
     var target = [0, 35, 0];
     var up = [0, 1, 0];
@@ -245,36 +202,22 @@ function start() {
 
     // Make a view matrix from the camera matrix.
     var viewMatrix = m4.inverse(cameraMatrix);
-    //console.log("3: " + rotation);
-
 
     // Compute a view projection matrix
     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-    // let worldMatrix = m4.xRotation(fRotationRadians);
     let worldMatrix = m4.xRotation(rotation[0]);
     worldMatrix = m4.yRotate(worldMatrix, rotation[1]);
     worldMatrix = m4.zRotate(worldMatrix, rotation[2]);
   
+    let worldViewProjectionMatrix = m4.multiply(viewProjectionMatrix, worldMatrix);
+    let worldInverseMatrix = m4.inverse(worldMatrix);
+    let worldInverseTransposeMatrix = m4.transpose(worldInverseMatrix);
 
-    //worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
-
-    //worldMatrix = m4.yRotate(worldMatrix, rotation[1]);
- 
-    //worldMatrix = m4.zRotate(worldMatrix, rotation[2]);
-    //console.log(rotation)
-    //let worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
-    // Multiply the matrices.
-    var worldViewProjectionMatrix = m4.multiply(viewProjectionMatrix, worldMatrix);
-    var worldInverseMatrix = m4.inverse(worldMatrix);
-    var worldInverseTransposeMatrix = m4.transpose(worldInverseMatrix);
-    //worldInverseTransposeMatrix = m4.xRotate(worldInverseTransposeMatrix, rotation[0])
-    // Set the matrices
     gl.uniformMatrix4fv(worldViewProjectionLocation, false, worldViewProjectionMatrix);
     gl.uniformMatrix4fv(worldInverseTransposeLocation, false, worldInverseTransposeMatrix);
     gl.uniformMatrix4fv(worldLocation, false, worldMatrix);
 
-    // Set the color to use
     gl.uniform4fv(colorLocation, [0.1, 1, 0.1, 1]);
 
     //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
@@ -282,7 +225,7 @@ function start() {
     // gl.uniform3fv(lightWorldPositionLocation2, [90, 30, 110]);
 
     gl.uniform3fv(lightWorldPositionLocation, [0, 30, 100]);
-    gl.uniform3fv(lightWorldPositionLocation2, [60, 60, 110]);
+    gl.uniform3fv(lightWorldPositionLocation2, [60, 60, 260]);
 
     gl.uniform3fv(lightColorLocation, m4.normalize([0.1, 0.1, 1]));
     gl.uniform3fv(specularColorLocation, m4.normalize([0.1, 0.1, 1]));
@@ -302,8 +245,6 @@ function start() {
       requestAnimationFrame(drawScene);
     }
   }
-
-  console.log("print")
 }
 
   function radToDeg(r) {
