@@ -94,21 +94,17 @@ function start() {
 
   let texcoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-  //gl.enableVertexAttribArray(texcoordLocation);
-  //gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
   setTextureCoords(gl);
 
-  var texture = gl.createTexture();
+  let texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  // Fill the texture with a 1x1 blue pixel.
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
-  var image = new Image();
+  let image = new Image();
   image.src = "./texture.jpg";
   image.crossOrigin = "anonymous";
   image.addEventListener('load', function() {
-    // Now that the image has loaded make copy it to the texture.
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
@@ -309,13 +305,13 @@ let choords = [
 
     //Top Front O
     //5
-    150, 0, 0,
-    60, 0, 0,
-    60, 30, 0,
+    120, 0, 0,
+    90, 0, 0,
+    90, 30, 0,
     //6
-    60, 30, 0,
-    150, 30, 0,
-    150, 0, 0,
+    90, 30, 0,
+    120, 30, 0,
+    120, 0, 0,
 
     //LEFT FRONT O
     //7
@@ -329,13 +325,13 @@ let choords = [
 
     //Bottom FRONT O
     //9
-    60,120, 0,
-    60,150, 0,
-    150,120, 0,
+    90,120, 0,
+    90,150, 0,
+    120,120, 0,
     //10
-    60,150, 0,
-    150,150, 0,
-    150,120, 0,
+    90,150, 0,
+    120,150, 0,
+    120,120, 0,
 
 
     //RIGHT Front O
@@ -371,13 +367,13 @@ let choords = [
 
     //Bottom
     //5
-    150, 0, 30,
-    60, 30, 30,
-    60, 0, 30,
+    120, 0, 30,
+    90, 30, 30,
+    90, 0, 30,
     //6
-    60, 30, 30,
-    150, 0, 30,
-    150, 30, 30,
+    90, 30, 30,
+    120, 0, 30,
+    120, 30, 30,
     //7
     90,0, 30,
     90,150, 30,
@@ -387,13 +383,13 @@ let choords = [
     90,0, 30,
     60,150, 30,
     //9
-    60,120, 30,
-    150,120, 30,
-    60,150, 30,
+    90,120, 30,
+    120,120, 30,
+    90,150, 30,
     //10
-    60,150, 30,
-    150,120, 30,
-    150,150, 30,
+    90,150, 30,
+    120,120, 30,
+    120,150, 30,
     //11
     150,150, 30,
     120,150, 30,
