@@ -102,7 +102,7 @@ function start() {
                 new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
   let image = new Image();
-  image.src = "./texture.jpg";
+  image.src = "./texture3.jpg";
   image.crossOrigin = "anonymous";
   image.addEventListener('load', function() {
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -126,7 +126,7 @@ function start() {
 
 
   let then = 0;
-  //drawScene(then)
+  drawScene(then)
   document.addEventListener('keydown', function(event){
     console.log(event.key)
     if(event.key === 'Enter') {
@@ -166,11 +166,11 @@ function start() {
   function drawScene(now) {
     now*=0.001
     let delta = now - then;
+    console.log("now: " + now + "\n then: " + then);
     then = now;
     if(animationKey){
-      console.log("now: " + now + "\n then: " + then);
+      
       //console.log("1: " + rotation);
-
       rotation[0] += rotationSpeed * delta;
       rotation[1] += rotationSpeed * delta;
       //console.log("2: " + rotation);
