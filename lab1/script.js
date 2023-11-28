@@ -1,4 +1,5 @@
 let gl;
+let animationKey = true;
 
 "use strict";
 
@@ -67,6 +68,7 @@ function start() {
   
   let positionLocation = gl.getAttribLocation(program, "a_position");
   let normalLocation = gl.getAttribLocation(program, "a_normal");
+  let texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
   
   // lookup uniforms
   let worldViewProjectionLocation = gl.getUniformLocation(program, "u_worldViewProjection");
@@ -78,6 +80,7 @@ function start() {
   let viewWorldPositionLocation = gl.getUniformLocation(program, "u_viewWorldPosition");
   let worldLocation = gl.getUniformLocation(program, "u_world");
   let shininessLocation = gl.getUniformLocation(program, "u_shininess");
+  let textureLocation = gl.getUniformLocation(program, "u_texture");
 
   
   // Position Buffer
@@ -88,6 +91,28 @@ function start() {
   let normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
   setNormals(gl);
+
+  let texcoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+  //gl.enableVertexAttribArray(texcoordLocation);
+  //gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
+  setTextureCoords(gl);
+
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  // Fill the texture with a 1x1 blue pixel.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                new Uint8Array([0, 0, 255, 255]));
+  // Asynchronously load an image
+  var image = new Image();
+  image.src = "./texture.jpg";
+  image.crossOrigin = "anonymous";
+  image.addEventListener('load', function() {
+    // Now that the image has loaded make copy it to the texture.
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+  });
 
   //let translation = [-150, 0, -360];
   let rotation = [degToRad(40), degToRad(40), degToRad(40)];
@@ -100,19 +125,37 @@ function start() {
   fieldOfView.min = -720;
   fieldOfView.max = 720;
 
-  fieldOfView.oninput = function() {
-    fRotationRadians = degToRad(fieldOfView.value);
-    drawScene();
-  }
+
+
+
 
   let then = 0;
-  requestAnimationFrame(drawScene);
+  //requestAnimationFrame(drawScene);
+  drawScene(then)
+  document.addEventListener('keydown', function(event){
+    if(event.key === 'Enter') {
+      console.log(event.key)
+      if(!animationKey)
+        requestAnimationFrame(drawScene);
+      animationKey = !animationKey;
+    }
+  })
+
+  fieldOfView.oninput = function() {
+    fRotationRadians = degToRad(fieldOfView.value);
+    //requestAnimationFrame(drawScene);
+    drawScene(then);
+  } 
 
   function drawScene(now) {
-    now*=0.001
-    let delta = now - then;
-    then = now;
-    rotation[0] += rotationSpeed * delta;
+    if(animationKey){
+      now*=0.001
+      let delta = now - then;
+      then = now;
+      rotation[0] += rotationSpeed * delta;
+      rotation[1] += rotationSpeed * delta;
+    }
+    console.log(rotation);
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -151,6 +194,18 @@ function start() {
     offset = 0;               // start at the beginning of the buffer
     gl.vertexAttribPointer(normalLocation, size, type, normalize, stride, offset);
 
+    // Turn on the texcoord attribute
+    gl.enableVertexAttribArray(texcoordLocation);
+    // bind the texcoord buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+    // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+    size = 2;          // 2 components per iteration
+    type = gl.FLOAT;   // the data is 32bit floats
+    normalize = false; // don't normalize the data
+    stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    offset = 0;        // start at the beginning of the buffer
+    gl.vertexAttribPointer(texcoordLocation, size, type, normalize, stride, offset);
+
 
     
     let aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -176,13 +231,17 @@ function start() {
     // Compute a view projection matrix
     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-    let worldMatrix = m4.xRotation(fRotationRadians);
-
+    let worldMatrix = m4.yRotation(fRotationRadians);
+    
     worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
-
     worldMatrix = m4.yRotate(worldMatrix, rotation[1]);
+  
+
+    //worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
+
+    //worldMatrix = m4.yRotate(worldMatrix, rotation[1]);
  
-    worldMatrix = m4.zRotate(worldMatrix, rotation[2]);
+    //worldMatrix = m4.zRotate(worldMatrix, rotation[2]);
     //console.log(rotation)
     //let worldMatrix = m4.xRotate(worldMatrix, rotation[0]);
     // Multiply the matrices.
@@ -197,20 +256,23 @@ function start() {
 
     // Set the color to use
     gl.uniform4fv(colorLocation, [0.1, 1, 0.1, 1]);
-    //gl.uniform3fv(lightColorLocation, m4.normalize([1, 0.6, 0.6]));
 
     //gl.uniform3fv(lightWorldPositionLocation, [100, 150, 20]);
-    gl.uniform3fv(lightWorldPositionLocation, [10, 30, 40]);
-    gl.uniform3fv(lightWorldPositionLocation2, [150, 20, 150]);
+    gl.uniform3fv(lightWorldPositionLocation, [-30, 10, 40]);
+    gl.uniform3fv(lightWorldPositionLocation, [150, 20, 160]);
 
     gl.uniform3fv(viewWorldPositionLocation, camera);
-    gl.uniform1f(shininessLocation, 400);
+    gl.uniform1f(shininessLocation, 1000);
+    gl.uniform1i(textureLocation, 0);
 
     // Draw the geometry.
     let primitiveType = gl.TRIANGLES;
     let count = choords.length/2;
     gl.drawArrays(primitiveType, offset, count);
-    requestAnimationFrame(drawScene);
+    if(animationKey){
+      requestAnimationFrame(drawScene);
+    }
+    //requestAnimationFrame(drawScene);
   }
 
   console.log("print")
@@ -719,4 +781,220 @@ function setNormals(gl) {
  
 ]);
   gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+}
+
+function setTextureCoords(gl) {
+  gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        // left column front
+        0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
+        1, 1,
+        1, 0,
+
+        // middle rung front
+        0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
+        1, 1,
+        1, 0,
+
+        // top front o
+        0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
+        1, 1,
+        1, 0,
+
+        // Left front o
+        0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
+        1, 1,
+        1, 0,
+
+        // Bottom front o
+        0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
+        1, 1,
+        1, 0,
+
+        // Right front o
+        0, 0,
+        0, 1,
+        1, 0,
+        0, 1,
+        1, 1,
+        1, 0,
+
+
+        // left column back
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
+
+        // Middle rung back
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
+
+        // Bottom back O
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
+
+        // LEft back O
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
+
+        // Right back O
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
+
+        // Top back O
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 1,
+        1, 0,
+        1, 1,
+
+        //filling
+        // First Vertical
+        0, 0,
+        1, 1,
+        1, 0,
+        0, 0,
+        0, 1,
+        1, 1,
+
+        // first bottom
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        // First Top
+        0, 0,
+        1, 0,
+        1, 1,
+        0, 0,
+        1, 1,
+        0, 1,
+
+        // Second Vertical
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        // Left vertical O outer
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        // right Vertical O outer
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+
+        // Middle Bottom
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        // Middle Top
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+        // Last Bottom O outer
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        // Last Top O outer
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+
+        // Left O Inner
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        //Right O Inner
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+
+        //Bottom O inner
+        0, 0,
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 1,
+        1, 0,
+
+        // Top O inner
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+]),
+      gl.STATIC_DRAW);
 }

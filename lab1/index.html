@@ -67,6 +67,7 @@
   <script  id="vertex-shader-3d" type="notjs">
     attribute vec4 a_position;
     attribute vec3 a_normal;
+    attribute vec2 a_texcoord;
 
     uniform vec3 u_lightWorldPosition[2];
     uniform vec3 u_viewWorldPosition;
@@ -80,6 +81,9 @@
     varying vec3 v_surfaceToLight;
     varying vec3 v_surfaceToLight2;
     varying vec3 v_surfaceToView;
+
+    varying vec2 v_texcoord;
+
 
     void main() {
     // Multiply the position by the matrix.
@@ -97,6 +101,8 @@
     v_surfaceToLight = u_lightWorldPosition[0] - surfaceWorldPosition;
     v_surfaceToLight2 = u_lightWorldPosition[1] - surfaceWorldPosition;
     v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
+    
+    v_texcoord = a_texcoord;
 }
   </script>
   <script  id="fragment-shader-3d" type="notjs">
@@ -108,9 +114,13 @@
     varying vec3 v_surfaceToLight2;
     varying vec3 v_surfaceToView;
 
+    varying vec2 v_texcoord;
+
+    uniform sampler2D u_texture;
     
     uniform vec4 u_color;
     uniform float u_shininess;
+    
     
     void main() {
       // because v_normal is a varying it's interpolated
@@ -132,15 +142,16 @@
         specular = pow(dot(normal, halfVector), u_shininess);
       }
     
-      gl_FragColor = u_color;
+      gl_FragColor = texture2D(u_texture, v_texcoord);
+      //gl_FragColor = u_color;
     
       // Lets multiply just the color portion (not the alpha)
       // by the light
       vec3 color = gl_FragColor.rgb * light + gl_FragColor.rgb * light2;
       //gl_FragColor.rgb *= light * u_lightColor;
-
+      gl_FragColor.rgb += color;
       //gl_FragColor.rgb *= light2;
-      gl_FragColor.rgb = color;// + specular; //+ specular;
+      //gl_FragColor.rgb = color + specular;// + specular2;
     }
   </script>
   <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
