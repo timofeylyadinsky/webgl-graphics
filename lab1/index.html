@@ -16,8 +16,8 @@
       <td>
         <form>
           <div>
-            <input type="radio" id="textureChoice1" class="selectTexture" name="texture" value="texture12" />
-            <label for="textureChoice1">12</label>
+            <input type="radio" id="textureChoice1" class="selectTexture" name="texture" value="texture8" />
+            <label for="textureChoice1">8</label>
         
             <input type="radio" id="textureChoice2" class="selectTexture" name="texture" value="texture7" />
             <label for="textureChoice2">7</label>
@@ -113,8 +113,8 @@
     
       gl_FragColor = texture2D(u_texture, v_texcoord);
     
-      vec3 color = gl_FragColor.rgb * light * u_lightColor[0]  + gl_FragColor.rgb * light2 * u_lightColor[1];
-      gl_FragColor.rgb += color + specular * u_specularColor[0] + specular2 * u_specularColor[1];
+      vec3 color = gl_FragColor.rgb * light * u_lightColor[0] + gl_FragColor.rgb * light2 * u_lightColor[1];
+      gl_FragColor.rgb = color + specular * u_specularColor[0] + specular2 * u_specularColor[1];
       //gl_FragColor.rgb *= light2;
       //gl_FragColor.rgb = color + specular;// + specular2;
     }
