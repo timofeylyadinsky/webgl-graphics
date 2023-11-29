@@ -78,6 +78,7 @@ function start() {
   let specularColorLocation = gl.getUniformLocation(program, "u_specularColor[0]");
   let lightColorLocation2 = gl.getUniformLocation(program, "u_lightColor[1]");
   let specularColorLocation2 = gl.getUniformLocation(program, "u_specularColor[1]");
+  //console.log(gl.getUniformLocation(program, "u_lightColor[0]"))
   // Buffers
   let positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -129,6 +130,74 @@ function start() {
   //fieldOfView.min = -720;
   //fieldOfView.max = 720;
 
+  let light1Color = [0.1, 0.5, 1];
+  let light1ColorPosition = [0, 30, 100];
+  let light2ColorPosition = [60, 0, 260];
+  let light2Color = [1, 0.1, 0.1];
+
+  let light1ColorPositionX = document.getElementById("light1ColorPositionX");
+  light1ColorPositionX.value = light1ColorPosition[0];
+  let light1ColorPositionY = document.getElementById("light1ColorPositionY");
+  light1ColorPositionY.value = light1ColorPosition[1];
+  let light1ColorPositionZ = document.getElementById("light1ColorPositionZ");
+  light1ColorPositionZ.value = light1ColorPosition[2];
+
+  let light1ColorR = document.getElementById("light1ColorR");
+  light1ColorR.value = light1Color[0];
+  let light1ColorG = document.getElementById("light1ColorG");
+  light1ColorG.value = light1Color[1];
+  let light1ColorB = document.getElementById("light1ColorB");
+  light1ColorB.value = light1Color[2];
+
+  let light2ColorR = document.getElementById("light2ColorR");
+  light2ColorR.value = light2Color[0];
+  let light2ColorG = document.getElementById("light2ColorG");
+  light2ColorG.value = light2Color[1];
+  let light2ColorB = document.getElementById("light2ColorB");
+  light2ColorB.value = light2Color[2];
+
+  light1ColorPositionX.oninput = function() {
+    light1ColorPosition[0] = light1ColorPositionX.value;
+    requestAnimationFrame(drawScene);
+  }
+  light1ColorPositionY.oninput = function() {
+    light1ColorPosition[1] = light1ColorPositionY.value;
+    requestAnimationFrame(drawScene);
+  }
+  light1ColorPositionZ.oninput = function() {
+    light1ColorPosition[2] = light1ColorPositionZ.value;
+    requestAnimationFrame(drawScene);
+  }
+
+
+  light1ColorR.oninput = function() {
+    //console.log(light1Color)
+    //console.log(Math.floor(Math.random()*4))
+    light1Color[0] = light1ColorR.value;
+    requestAnimationFrame(drawScene);
+  }
+  light1ColorG.oninput = function() {
+    light1Color[1] = light1ColorG.value;
+    requestAnimationFrame(drawScene);
+  }
+  light1ColorB.oninput = function() {
+    light1Color[2] = light1ColorB.value;
+    requestAnimationFrame(drawScene);
+  }
+  light2ColorR.oninput = function() {
+    light2Color[0] = light2ColorR.value;
+    requestAnimationFrame(drawScene);
+  }
+  light2ColorG.oninput = function() {
+    light2Color[1] = light2ColorG.value;
+    requestAnimationFrame(drawScene);
+  }
+  light2ColorB.oninput = function() {
+    light2Color[2] = light2ColorB.value;
+    requestAnimationFrame(drawScene);
+  }
+
+
   let then = 0;
   drawScene(then)
   document.addEventListener('keydown', function(event){
@@ -160,7 +229,7 @@ function start() {
   function drawScene(now) {
     now*=0.001
     let delta = now - then;
-    console.log("now: " + now + "\n then: " + then);
+    //console.log("now: " + now + "\n then: " + then);
     then = now;
     if(animationKey){
       //console.log("1: " + rotation);
@@ -242,14 +311,14 @@ function start() {
     // gl.uniform3fv(lightWorldPositionLocation, [0, 30, 100]);
     // gl.uniform3fv(lightWorldPositionLocation2, [90, 30, 110]);
 
-    gl.uniform3fv(lightWorldPositionLocation, [0, 30, 100]);
-    gl.uniform3fv(lightWorldPositionLocation2, [60, 0, 260]);
+    gl.uniform3fv(lightWorldPositionLocation, light1ColorPosition);
+    gl.uniform3fv(lightWorldPositionLocation2, light2ColorPosition);
 
-    gl.uniform3fv(lightColorLocation, m4.normalize([0.1, 0.1, 1]));
-    gl.uniform3fv(specularColorLocation, m4.normalize([0.1, 0.1, 1]));
+    gl.uniform3fv(lightColorLocation, m4.normalize(light1Color));
+    gl.uniform3fv(specularColorLocation, m4.normalize(light1Color));
 
-    gl.uniform3fv(lightColorLocation2, m4.normalize([1, 0.1, 0.1]));
-    gl.uniform3fv(specularColorLocation2, m4.normalize([1, 0.1, 0.1]));
+    gl.uniform3fv(lightColorLocation2, m4.normalize(light2Color));
+    gl.uniform3fv(specularColorLocation2, m4.normalize(light2Color));
 
     gl.uniform3fv(viewWorldPositionLocation, camera);
     gl.uniform1f(shininessLocation, 200);
