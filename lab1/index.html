@@ -13,56 +13,21 @@
   </canvas>
   <table>
     <tr>
-      <td>Field Of View</td>
       <td>
-          <input type="range" class="slider" id="fieldOfView">
+        <form>
+          <div>
+            <input type="radio" id="textureChoice1" class="selectTexture" name="texture" value="texture12" />
+            <label for="textureChoice1">12</label>
+        
+            <input type="radio" id="textureChoice2" class="selectTexture" name="texture" value="texture7" />
+            <label for="textureChoice2">7</label>
+        
+            <input type="radio" id="textureChoice3" class="selectTexture" name="texture" value="texture11" />
+            <label for="textureChoice3">11</label>
+          </div>
+        </form>
       </td>
     </tr>
-    <tr>
-      <td>Move X</td>
-      <td>
-          <input type="range" class="slider" id="moveX">
-      </td>
-      <td>
-          <input type="number" step="1" id="moveXOut">
-      </td>
-  </tr>
-  <tr>
-      <td>Move Y</td>
-      <td>
-          <input type="range" class="slider" id="moveY">
-      </td>
-      <td>
-          <input type="number" step="1" id="moveYOut">
-      </td>
-  </tr>
-  <tr>
-    <td>Move Z</td>
-    <td>
-        <input type="range" class="slider" id="moveZ">
-    </td>
-    <td>
-        <input type="number" step="1" id="moveZOut">
-    </td>
-</tr>
-  <tr>
-      <td>Rotation X</td>
-      <td>
-          <input type="range" class="slider" id="angleX">
-      </td>
-  </tr>
-  <tr>
-    <td>Rotation Y</td>
-    <td>
-        <input type="range" class="slider" id="angleY">
-    </td>
-</tr>
-<tr>
-  <td>Rotation Z</td>
-  <td>
-      <input type="range" class="slider" id="angleZ">
-  </td>
-</tr>
   </table>
   <script  id="vertex-shader-3d" type="notjs">
     attribute vec4 a_position;

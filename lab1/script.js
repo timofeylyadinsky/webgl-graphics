@@ -94,22 +94,40 @@ function start() {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
   let image = new Image();
-  image.src = "./texture5.jpg";
+  image.src = "./texture11.jpg";
   image.crossOrigin = "anonymous";
-  image.addEventListener('load', function() {
+  image.addEventListener('load', choiceTexture)
+  //function() {
+    // gl.bindTexture(gl.TEXTURE_2D, texture);
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+    // gl.generateMipmap(gl.TEXTURE_2D);
+  //});
+
+
+  function choiceTexture() {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
-  });
+  }
+
+  let textureChoice = document.querySelectorAll('.selectTexture');
+
+  textureChoice.forEach(el => el.addEventListener('click', event => {
+    console.log(el.value);
+    image.src = "./" + el.value + ".jpg";
+    image.crossOrigin = "anonymous";
+    choiceTexture();
+    requestAnimationFrame(drawScene);
+  }));
 
   //let translation = [-150, 0, -360];
   let rotation = [degToRad(40), degToRad(40), degToRad(40)];
   let fieldOfViewRadians = degToRad(60);
   let rotationSpeed = [1.2, 0.9];
 
-  fieldOfView.value = radToDeg(fieldOfViewRadians);
-  fieldOfView.min = -720;
-  fieldOfView.max = 720;
+  //fieldOfView.value = radToDeg(fieldOfViewRadians);
+  //fieldOfView.min = -720;
+  //fieldOfView.max = 720;
 
   let then = 0;
   drawScene(then)
@@ -146,6 +164,7 @@ function start() {
     then = now;
     if(animationKey){
       //console.log("1: " + rotation);
+      if (delta > 1) delta = 0;
       rotation[0] += rotationSpeed[1] * delta;
       rotation[1] += rotationSpeed[0] * delta;
       //console.log("2: " + rotation);
@@ -224,7 +243,7 @@ function start() {
     // gl.uniform3fv(lightWorldPositionLocation2, [90, 30, 110]);
 
     gl.uniform3fv(lightWorldPositionLocation, [0, 30, 100]);
-    gl.uniform3fv(lightWorldPositionLocation2, [60, 60, 260]);
+    gl.uniform3fv(lightWorldPositionLocation2, [60, 0, 260]);
 
     gl.uniform3fv(lightColorLocation, m4.normalize([0.1, 0.1, 1]));
     gl.uniform3fv(specularColorLocation, m4.normalize([0.1, 0.1, 1]));
