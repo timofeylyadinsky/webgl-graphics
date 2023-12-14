@@ -45,9 +45,9 @@ function start() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
    
-    camera.position.x = -140;
-    camera.position.y = 120;
-    camera.position.z = 100;
+    camera.position.x = -14;
+    camera.position.y = 12;
+    camera.position.z = 10;
     camera.lookAt(scene.position);
     //scene.add(new THREE.GridHelper(100, 300));
     
@@ -165,9 +165,9 @@ function loadModel() {
 }
 
 function animate() {
-    //camera.lookAt(scene.position);
-    requestAnimationFrame( animate );
     renderer.render( scene, camera );
+    requestAnimationFrame( animate );
+
 }
 
 
@@ -199,31 +199,28 @@ function addControls(controlObject) {
     directionalLightFolder.add(light.position, 'x', -10, 10, 0.1);
     directionalLightFolder.add(light.position, 'y', -10, 10, 0.1);
     directionalLightFolder.add(light.position, 'z', -10, 10, 0.1);
-    
+
 }
 
 
-// let rotateX = document.getElementById("rotateX");
-// rotateX.value = light.position.x;
-// rotateX.oninput = function() {
-//     //camera.position.x = rotateX.value
-//     light.position.x = rotateX.value;
-//     //requestAnimationFrame( animate );
-// }
-// let rotateY = document.getElementById("rotateY");
-// rotateY.value = light.position.y;
-// rotateY.oninput = function() {
-//     //camera.position.y = rotateY.value
-//     light.position.y = rotateY.value;
-//    //requestAnimationFrame( animate );
-// }
-// let rotateZ = document.getElementById("rotateZ");
-// rotateZ.value = light.position.z;
-// rotateZ.oninput = function() {
-//     // camera.position.z = rotateZ.value
-//     // requestAnimationFrame( animate );
-//     light.position.z = rotateZ.value;
-// }
+let rotateX = document.getElementById("rotateX");
+rotateX.value = camera.position.x;
+rotateX.oninput = function() {
+    camera.position.x = rotateX.value;
+    camera.lookAt(scene.position);
+}
+let rotateY = document.getElementById("rotateY");
+rotateY.value = camera.position.y;
+rotateY.oninput = function() {
+    camera.position.y = rotateY.value;
+    camera.lookAt(scene.position);
+}
+let rotateZ = document.getElementById("rotateZ");
+rotateZ.value = camera.position.z;
+rotateZ.oninput = function() {
+    camera.position.z = rotateZ.value;
+    camera.lookAt(scene.position);
+}
 
     // var cubeGeometry = new THREE.BoxGeometry(50, 50, 50);
     // var cubeMaterial = new THREE.MeshLambertMaterial();
