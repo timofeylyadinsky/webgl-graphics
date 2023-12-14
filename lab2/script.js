@@ -53,6 +53,9 @@ function start() {
         this.far = camera.far;
         this.near = camera.near;
 
+        this.repeatX = 2;
+        this.repeatY = 2;
+        
         this.updateCamera = function () {
             camera.left = control.left;
             camera.right = control.right;
@@ -61,7 +64,19 @@ function start() {
             camera.far = control.far;
             camera.near = control.near;
 
+            let map = scene.getObjectByName('mymodel');
+            // console.log(map)
+            map.traverse(node => {
+                console.log(node);
+                if(node.isMesh) {
+                    node.material.map.repeat.x = control.repeatX;
+                    node.material.map.repeat.y = control.repeatY;
+                    
+                } 
+            });
+
             camera.updateProjectionMatrix();
+            //animate();
         };
     };
 
@@ -86,16 +101,31 @@ function start() {
 
 function loadModel() {
     const loader = new GLTFLoader();
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('./public/texture9.jpg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
     loader.load( './public/untitled3.glb', function ( gltf ) {
-        gltf.scene.scale.set(500, 500, 500);
+        let model = gltf.scene; 
+        
         console.log(gltf);
-    scene.add( gltf.scene );
-    animate();
+        model.traverse(node => {
+            if(node.isMesh) {
+                console.log(Array.isArray(node.material));
+                node.material.map = texture;
+                node.material.map.repeat.x = 2;
+                node.material.map.repeat.y = 2;
+                node.material.needsUpdate = true;
+            } 
+        })
+        console.log(model);
+        model.name = 'mymodel';
+        model.scale.set(400, 400, 400);
+        scene.add( gltf.scene );
+        animate();
     }, undefined, function ( error ) {
         console.error( error );
     } );
-
-
 }
 
 function animate() {
@@ -113,6 +143,8 @@ function addControls(controlObject) {
     gui.add(controlObject, 'bottom', -1000, 0).onChange(controlObject.updateCamera);
     gui.add(controlObject, 'far', 100, 2000).onChange(controlObject.updateCamera);
     gui.add(controlObject, 'near', 0, 200).onChange(controlObject.updateCamera);
+    gui.add(controlObject, 'repeatX', -4, 4).step(0.1).onChange(control.updateCamera);
+    gui.add(controlObject, 'repeatY', -4, 4).step(0.1).onChange(control.updateCamera);
 }
 
 // let rotateX = document.getElementById("rotateX");
