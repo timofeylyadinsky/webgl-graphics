@@ -40,6 +40,8 @@ function start() {
     renderer.setClearColor(0x000000, 1.0);
     // renderer.shadowMapEnabled = true;
     renderer.shadowMap.enabled = true;
+    // renderer.shadowMap.renderReverseSided = false;
+    // renderer.shadowMapCullFrontFaces = false;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
    
@@ -96,25 +98,35 @@ function start() {
     scene.add(ambiLight);
 
     loadModel();
+    addPlanes();
 
     const helper = new THREE.CameraHelper( light.shadow.camera );
     scene.add( helper );
 
-    const planeGeometry = new THREE.PlaneGeometry( 2, 2, 10, 10 );
-    const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } )
-    const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-// plane.rotation.x = 1.5708;
-plane.rotation.x = Math.PI / 180 * -90;
-// plane.rotation.y = Math.PI / 180 * 45;
-    plane.castShadow = true;
-    plane.receiveShadow = true;
-    scene.add( plane );
 
     document.body.appendChild( renderer.domElement );
 
     addControls(control);
 
     animate();
+}
+
+function addPlanes() {
+    const planeGeometry = new THREE.PlaneGeometry( 2, 2, 10, 10 );
+    const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } )
+    const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+    // plane.rotation.x = 1.5708;
+    plane.rotation.x = Math.PI / 180 * -90;
+    plane.position.y = -0.5;
+    // plane.rotation.y = Math.PI / 180 * 45;
+    plane.castShadow = true;
+    plane.receiveShadow = true;
+    scene.add( plane );
+    const plane2 = new THREE.Mesh( planeGeometry, planeMaterial );
+    plane2.castShadow = true;
+    plane2.receiveShadow = true;
+    plane2.position.z = -0.5;
+    scene.add( plane2 );
 }
 
 function loadModel() {
@@ -132,6 +144,7 @@ function loadModel() {
                 console.log(Array.isArray(node.material));
                 node.material.map = texture;
                 node.castShadow = true;
+                node.receiveShadow = true;
                 node.material.map.repeat.x = 2;
                 node.material.map.repeat.y = 2;
                 node.material.needsUpdate = true;
