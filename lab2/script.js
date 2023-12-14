@@ -28,7 +28,7 @@ function start() {
     camera.top = 1;
     camera.bottom = -1;
     camera.near = 0.001;
-    camera.far = 1500;
+    camera.far = 400;
     // // camera.zoom = 100
 
     console.log(camera);
@@ -92,6 +92,10 @@ function start() {
     light.position.set(1, 0, 0);
     light.castShadow = true;
     light.intensity = 2;
+    light.shadow.mapSize.width = 1024; // default
+    light.shadow.mapSize.height = 1024; // default
+    light.shadow.camera.near = 0.5; // default
+    light.shadow.camera.far = 500; // default
     scene.add(light);
 
     let ambiLight = new THREE.AmbientLight(0x333333);
@@ -112,7 +116,7 @@ function start() {
 }
 
 function addPlanes() {
-    const planeGeometry = new THREE.PlaneGeometry( 2, 2, 10, 10 );
+    const planeGeometry = new THREE.BoxGeometry( 1, 1, 0.1);
     const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } )
     const plane = new THREE.Mesh( planeGeometry, planeMaterial );
     // plane.rotation.x = 1.5708;
@@ -135,7 +139,7 @@ function loadModel() {
     const texture = textureLoader.load('./public/texture9.jpg');
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
-    loader.load( './public/untitled2.glb', function ( gltf ) {
+    loader.load( './public/untitled3.glb', function ( gltf ) {
         let model = gltf.scene; 
         
         console.log(gltf);
@@ -169,37 +173,57 @@ function animate() {
 
 function addControls(controlObject) {
     var gui = new dat.GUI();
-    gui.add(controlObject, 'left', -1000, 0).onChange(controlObject.updateCamera);
-    gui.add(controlObject, 'right', 0, 1000).onChange(controlObject.updateCamera);
-    gui.add(controlObject, 'top', 0, 1000).onChange(controlObject.updateCamera);
-    gui.add(controlObject, 'bottom', -1000, 0).onChange(controlObject.updateCamera);
-    gui.add(controlObject, 'far', 100, 2000).onChange(controlObject.updateCamera);
-    gui.add(controlObject, 'near', 0, 200).onChange(controlObject.updateCamera);
-    gui.add(controlObject, 'repeatX', -4, 4).step(0.1).onChange(control.updateCamera);
-    gui.add(controlObject, 'repeatY', -4, 4).step(0.1).onChange(control.updateCamera);
+    const cameraOrth = gui.addFolder('THREE.OrthographicCamera');
+    cameraOrth.add(controlObject, 'left', -2, 0).onChange(controlObject.updateCamera);
+    cameraOrth.add(controlObject, 'right', 0, 2).onChange(controlObject.updateCamera);
+    cameraOrth.add(controlObject, 'top', 0, 2).onChange(controlObject.updateCamera);
+    cameraOrth.add(controlObject, 'bottom', -2, 0).onChange(controlObject.updateCamera);
+    cameraOrth.add(controlObject, 'far', 100, 400).onChange(controlObject.updateCamera);
+    cameraOrth.add(controlObject, 'near', 0, 200).onChange(controlObject.updateCamera);
+    const texture = gui.addFolder('Texture Repeate');
+    texture.add(controlObject, 'repeatX', -4, 4).step(0.1).onChange(control.updateCamera);
+    texture.add(controlObject, 'repeatY', -4, 4).step(0.1).onChange(control.updateCamera);
+    
+    const data = {
+        color: light.color.getHex(),
+        mapsEnabled: true,
+        shadowMapSizeWidth: 512,
+        shadowMapSizeHeight: 512,
+    }
+    const lightFolder = gui.addFolder('THREE.Light')
+    lightFolder.addColor(data, 'color').onChange(() => {
+        light.color.setHex(Number(data.color.toString().replace('#', '0x')))
+    });
+    lightFolder.add(light, 'intensity', 0, Math.PI * 2, 0.01);
+    const directionalLightFolder = gui.addFolder('THREE.DirectionalLight');
+    directionalLightFolder.add(light.position, 'x', -10, 10, 0.1);
+    directionalLightFolder.add(light.position, 'y', -10, 10, 0.1);
+    directionalLightFolder.add(light.position, 'z', -10, 10, 0.1);
+    
 }
 
-let rotateX = document.getElementById("rotateX");
-rotateX.value = light.position.x;
-rotateX.oninput = function() {
-    //camera.position.x = rotateX.value
-    light.position.x = rotateX.value;
-    //requestAnimationFrame( animate );
-}
-let rotateY = document.getElementById("rotateY");
-rotateY.value = light.position.y;
-rotateY.oninput = function() {
-    //camera.position.y = rotateY.value
-    light.position.y = rotateY.value;
-   //requestAnimationFrame( animate );
-}
-let rotateZ = document.getElementById("rotateZ");
-rotateZ.value = light.position.z;
-rotateZ.oninput = function() {
-    // camera.position.z = rotateZ.value
-    // requestAnimationFrame( animate );
-    light.position.z = rotateZ.value;
-}
+
+// let rotateX = document.getElementById("rotateX");
+// rotateX.value = light.position.x;
+// rotateX.oninput = function() {
+//     //camera.position.x = rotateX.value
+//     light.position.x = rotateX.value;
+//     //requestAnimationFrame( animate );
+// }
+// let rotateY = document.getElementById("rotateY");
+// rotateY.value = light.position.y;
+// rotateY.oninput = function() {
+//     //camera.position.y = rotateY.value
+//     light.position.y = rotateY.value;
+//    //requestAnimationFrame( animate );
+// }
+// let rotateZ = document.getElementById("rotateZ");
+// rotateZ.value = light.position.z;
+// rotateZ.oninput = function() {
+//     // camera.position.z = rotateZ.value
+//     // requestAnimationFrame( animate );
+//     light.position.z = rotateZ.value;
+// }
 
     // var cubeGeometry = new THREE.BoxGeometry(50, 50, 50);
     // var cubeMaterial = new THREE.MeshLambertMaterial();
